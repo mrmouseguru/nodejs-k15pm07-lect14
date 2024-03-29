@@ -93,13 +93,15 @@ myApi.get("/students/:id/courses", async (req, res) => {
   res.json({ courses: courses });
 });
 
-myApi.post("/students/:id/courses", (req, res) => {
+myApi.post("/students/:id/courses", async(req, res) => {
   let student = res.locals.student;
-  let courses = COURSES[student.id];
+ // let courses = COURSES[student.id];
   let code = req.body.code;
   let units = req.body.units;
-  courses.push({ code, units });
+  await Enrollments.insertOne({studentId : student.id, code, units});
+  //courses.push({ code, units });
   student.units += units;
+  await Students.replaceOne({id : student.id}, student);
   res.json({ success: true });
 });
 
